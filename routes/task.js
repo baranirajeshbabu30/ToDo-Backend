@@ -1,60 +1,133 @@
 const express = require('express');
 const Task = require('../models/Task');
+const User = require('../models/User'); 
 const router = express.Router();
+const mongoose = require('mongoose');
 
 router.post('/todo', async (req, res) => {
-    const { title, description, category, progress } = req.body;
-    const userId = req.userId; 
-  
-    if (!title || !description || !category || !progress) {
-      return res.status(400).json({ error: 'All fields are required' });
-    }
-  
-    try {
-      const task = new Task({ title, description, user: userId, category, progress });
-      await task.save();
-      res.status(201).json(task);
-    } catch (error) {
-      res.status(400).send(error.message);
-    }
-  });
-router.get('/todo', async (req, res) => {
-  try {
-    const tasks = await Task.find({ user: req.userId });
-    res.json(tasks);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
+  const { title, description, category, progress, userId } = req.body; 
 
-router.put('/todo/:id', async (req, res) => {
-  const { title, description, completed } = req.body;
+
+  if (!title || !description || !category || !progress || !userId) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
   try {
-    const task = await Task.findById(req.params.id);
-    if (!task || task.user.toString() !== req.userId) {
-      return res.status(403).send('Forbidden');
+    const user = await User.findOne({ userId: userId });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
-    task.title = title || task.title;
-    task.description = description || task.description;
-    task.completed = completed !== undefined ? completed : task.completed;
+
+    const task = new Task({ title, description, userId, category, progress });
     await task.save();
-    res.json(task);
+    res.status(201).json(task);
   } catch (error) {
+    console.error('Error saving task:', error);
     res.status(400).send(error.message);
   }
 });
 
-router.delete('/todo/:id', async (req, res) => {
+
+router.get('/todo/:userId', async (req, res) => {
+  const { userId } = req.params; 
+
+
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID is required' });
+  }
+
   try {
-    const task = await Task.findById(req.params.id);
-    if (!task || task.user.toString() !== req.userId) {
-      return res.status(403).send('Forbidden');
-    }
-    await task.remove();
-    res.status(204).send();
+  
+
+    const tasks = await Task.find({ user: userId });
+   res.status(201).json(tasks);
   } catch (error) {
     res.status(500).send(error.message);
   }
 });
+
+
+
+router.put('/todo/:id', async (req, res) => {
+  const { id } = req.params;  
+  const { title, description, progress,category } = req.body;  
+
+  try {
+    const task = await Task.findById(id);
+
+    if (!task) {
+      return res.status(404).send('Task not found');
+    }
+
+   
+
+    task.title = title || task.title;
+    task.description = description || task.description;
+    task.progress = progress || task.progress;
+    task.category = category || task.category;
+
+
+    await task.save();
+    res.json(task);  
+  } catch (error) {
+    console.error(error);  
+    res.status(400).send(error.message);  
+  }
+});
+
+
+
+router.delete('/todo/:id', async (req, res) => {
+  const { id } = req.params;
+
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).send('Invalid ID format');
+  }
+
+  try {
+    const result = await Task.deleteOne({ _id: id });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).send('Task not found');
+    }
+
+    res.status(204).send();  
+  } catch (error) {
+    console.error('Error deleting task:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+router.get('/todo/category/:userId', async (req, res) => {
+  const { userId } = req.params; 
+
+  const { category } = req.query;
+
+  if (!userId || !category) {
+    return res.status(400).json({ error: 'User ID and category are required' });
+  }
+
+  try {
+    const user = await User.findOne({ userId:userId });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const tasks = await Task.find({ user: userId, category });
+    if (tasks.length === 0) {
+      return res.status(404).json({ error: 'No tasks found for the specified user and category' });
+    }
+
+    res.status(200).json(tasks);
+
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 
 module.exports = router;

@@ -1,9 +1,9 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs'); 
 const User = require('../models/User');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
+const generateToken = require('../utils/generateToken'); 
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -21,13 +21,11 @@ router.post('/signup', async (req, res) => {
         }
 
         const userId = uuidv4();
-        const hashedPassword = await bcrypt.hash(password, 10);
-        console.log('Hashed Password:', hashedPassword);
 
         const user = new User({
             userId,
             username,
-            password: hashedPassword,
+            password, 
             useremail
         });
 
@@ -52,17 +50,16 @@ router.post('/login', async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        const isMatching = await user.comparePassword(password);
-        if (!isMatching) {
+        if (password !== user.password) {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
-        const token = jwt.sign({ userId: user.userId, useremail: user.useremail }, JWT_SECRET, { expiresIn: '1h' });
-        res.status(200).json({ token });
+
+        const token = generateToken(user);
+        res.status(200).json({ token,userId: user.userId,useremail });
     } catch (error) {
         console.error('Login error:', error.message);
         res.status(500).json({ error: 'Error logging in' });
     }
 });
-
 
 module.exports = router;

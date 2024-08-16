@@ -1,6 +1,10 @@
 const { v4: uuidv4 } = require('uuid');
 const User = require('../../models/User');
-
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*', // Adjust as needed
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Methods': 'OPTIONS, POST',
+};
 
 exports.handler = async function(event, context) {
   if (event.httpMethod === 'POST') {
@@ -9,6 +13,7 @@ exports.handler = async function(event, context) {
     if (!username || !password || !useremail) {
       return {
         statusCode: 400,
+        headers: corsHeaders,
         body: JSON.stringify({ error: 'All fields are required' }),
       };
     }
@@ -18,6 +23,8 @@ exports.handler = async function(event, context) {
       if (existingUser) {
         return {
           statusCode: 400,
+        headers: corsHeaders,
+
           body: JSON.stringify({ msg: 'User already exists' }),
         };
       }
@@ -33,12 +40,16 @@ exports.handler = async function(event, context) {
       await user.save();
       return {
         statusCode: 201,
+        headers: corsHeaders,
+
         body: JSON.stringify({ message: 'User created successfully' }),
       };
     } catch (error) {
       console.error('Signup error:', error.message);
       return {
         statusCode: 500,
+        headers: corsHeaders,
+
         body: JSON.stringify({ error: 'Error creating user' }),
       };
     }
@@ -46,6 +57,7 @@ exports.handler = async function(event, context) {
 
   return {
     statusCode: 405,
+    headers: corsHeaders,
     body: JSON.stringify({ error: 'Method Not Allowed' }),
   };
 };

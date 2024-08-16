@@ -8,6 +8,11 @@ if (mongoose.connection.readyState === 0) {
     useUnifiedTopology: true,
   });
 }
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*', // Adjust as needed
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Methods': 'OPTIONS, POST',
+  };
 
 exports.handler = async function (event, context) {
   switch (event.httpMethod) {
@@ -22,6 +27,8 @@ exports.handler = async function (event, context) {
     default:
       return {
         statusCode: 405,
+        headers: corsHeaders,
+
         body: JSON.stringify({ error: 'Method Not Allowed' }),
       };
   }
@@ -33,6 +40,8 @@ const createTask = async (event) => {
   if (!title || !description || !category || !progress || !userId || !duedate) {
     return {
       statusCode: 400,
+      headers: corsHeaders,
+
       body: JSON.stringify({ error: 'All fields are required' }),
     };
   }
@@ -42,6 +51,8 @@ const createTask = async (event) => {
     if (!user) {
       return {
         statusCode: 404,
+        headers: corsHeaders,
+
         body: JSON.stringify({ error: 'User not found' }),
       };
     }
@@ -50,12 +61,16 @@ const createTask = async (event) => {
     await task.save();
     return {
       statusCode: 201,
+      headers: corsHeaders,
+
       body: JSON.stringify(task),
     };
   } catch (error) {
     console.error('Error saving task:', error);
     return {
       statusCode: 400,
+      headers: corsHeaders,
+
       body: JSON.stringify({ error: error.message }),
     };
   }
@@ -67,6 +82,8 @@ const getTasks = async (event) => {
   if (!userId) {
     return {
       statusCode: 400,
+      headers: corsHeaders,
+
       body: JSON.stringify({ error: 'User ID is required' }),
     };
   }
@@ -75,12 +92,16 @@ const getTasks = async (event) => {
     const tasks = await Task.find({ userId });
     return {
       statusCode: 200,
+      headers: corsHeaders,
+
       body: JSON.stringify(tasks),
     };
   } catch (error) {
     console.error('Error fetching tasks:', error);
     return {
       statusCode: 500,
+      headers: corsHeaders,
+
       body: JSON.stringify({ error: error.message }),
     };
   }
@@ -96,6 +117,8 @@ const updateTask = async (event) => {
     if (!task) {
       return {
         statusCode: 404,
+        headers: corsHeaders,
+
         body: JSON.stringify({ error: 'Task not found' }),
       };
     }
@@ -108,12 +131,16 @@ const updateTask = async (event) => {
     await task.save();
     return {
       statusCode: 200,
+      headers: corsHeaders,
+
       body: JSON.stringify(task),
     };
   } catch (error) {
     console.error(error);
     return {
       statusCode: 400,
+      headers: corsHeaders,
+
       body: JSON.stringify({ error: error.message }),
     };
   }
@@ -125,6 +152,8 @@ const deleteTask = async (event) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return {
       statusCode: 400,
+      headers: corsHeaders,
+
       body: JSON.stringify({ error: 'Invalid ID format' }),
     };
   }
@@ -135,18 +164,24 @@ const deleteTask = async (event) => {
     if (result.deletedCount === 0) {
       return {
         statusCode: 404,
+        headers: corsHeaders,
+
         body: JSON.stringify({ error: 'Task not found' }),
       };
     }
 
     return {
       statusCode: 204,
+      headers: corsHeaders,
+
       body: null,
     };
   } catch (error) {
     console.error('Error deleting task:', error);
     return {
       statusCode: 500,
+      headers: corsHeaders,
+
       body: JSON.stringify({ error: 'Internal Server Error' }),
     };
   }

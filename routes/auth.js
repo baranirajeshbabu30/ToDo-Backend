@@ -8,6 +8,10 @@ const generateToken = require('../utils/generateToken');
 const JWT_SECRET = process.env.JWT_SECRET;
 
 router.post('/signup', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
     const { username, password, useremail } = req.body;
 
     if (!username || !password || !useremail) {
@@ -38,6 +42,10 @@ router.post('/signup', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers');
+
     const { useremail, password } = req.body;
 
     if (!useremail || !password) {
@@ -55,7 +63,7 @@ router.post('/login', async (req, res) => {
         }
 
         const token = generateToken(user);
-        res.status(200).json({ token,userId: user.userId,useremail });
+        res.status(200).json({ token, userId: user.userId, useremail });
     } catch (error) {
         console.error('Login error:', error.message);
         res.status(500).json({ error: 'Error logging in' });

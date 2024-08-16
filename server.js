@@ -12,12 +12,15 @@ require('dotenv').config();
 const app = express();
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type']
+  origin: ['http://localhost:3000', 'https://your-production-frontend-domain.com'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true 
 };
 
 app.use(cors(corsOptions));
+
+app.options('*', cors(corsOptions))
 app.use(express.json());
 
 const connectToMongoDB = () => {

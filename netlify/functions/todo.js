@@ -4,7 +4,7 @@ const User = require('../../models/User');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*', // Adjust as needed
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Headers': 'Content-Type',
   'Access-Control-Allow-Methods': 'OPTIONS, POST, GET, PUT, DELETE',
 };
 

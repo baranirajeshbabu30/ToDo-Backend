@@ -4,8 +4,8 @@ const generateToken = require('../../utils/generateToken');
 
 
 const corsHeaders = {
-    'Access-Control-Allow-Origin': '*', 
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Origin': 'https://zesty-gumdrop-5b2940.netlify.app', 
+    'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'OPTIONS, POST',
   };
   
@@ -54,7 +54,7 @@ const corsHeaders = {
           body: JSON.stringify({ token, userId: user.userId, useremail }),
         };
       } catch (error) {
-        console.error('Login error:', error); // Log the error to the Netlify function logs
+        console.error('Login error:', error); 
         return {
           statusCode: 500,
           headers: corsHeaders,

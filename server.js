@@ -48,8 +48,8 @@ const connectToMongoDB = () => {
 
 connectToMongoDB();
 
-app.use('/api/auth', authRoutes);
-app.use('/api/task', taskRoutes);
+app.use('/api', authRoutes);
+app.use('/api', taskRoutes);
 
 app.get('/author', (req, res) => {
   res.json({

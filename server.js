@@ -46,8 +46,6 @@ const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  console.log('Received Token:', token);
-  console.log('Secret:', process.env.JWT_SECRET || 'mysecretkey');
 
   if (!token) {
     return res.status(401).json({ message: 'Token required' });
@@ -59,7 +57,6 @@ const authenticateToken = (req, res, next) => {
       return res.status(403).json({ message: 'Invalid token' });
     }
 
-    console.log('Decoded Payload:', decoded);
     req.userId = decoded.userId;
     next();
   });
@@ -74,9 +71,9 @@ app.use('/api/task',  taskRoutes);
 
 app.get('/author', (req, res) => {
   res.json({
-    name: 'BaraniS',
-    github: 'https://github.com/yourusername/task-management-system'
+    name: 'Barani',
+    github: 'https://github.com/baranirajeshbabu30/ToDo-Backend'
   });
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => (`Server running on port ${PORT}`));

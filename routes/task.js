@@ -5,10 +5,10 @@ const router = express.Router();
 const mongoose = require('mongoose');
 
 router.post('/todo', async (req, res) => {
-  const { title, description, category, progress, userId } = req.body; 
+  const { title, description, category, progress, userId,duedate } = req.body; 
 
 
-  if (!title || !description || !category || !progress || !userId) {
+  if (!title || !description || !category || !progress || !userId || !duedate) {
     return res.status(400).json({ error: 'All fields are required' });
   }
 
@@ -18,7 +18,7 @@ router.post('/todo', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const task = new Task({ title, description, userId, category, progress });
+    const task = new Task({ title, description, userId, category, progress,duedate });
     await task.save();
     res.status(201).json(task);
   } catch (error) {
@@ -29,23 +29,20 @@ router.post('/todo', async (req, res) => {
 
 
 router.get('/todo/:userId', async (req, res) => {
-  const { userId } = req.params; 
-
+  const { userId } = req.params;
 
   if (!userId) {
     return res.status(400).json({ error: 'User ID is required' });
   }
 
   try {
-  
-
-    const tasks = await Task.find({ user: userId });
-   res.status(201).json(tasks);
+    const tasks = await Task.find({ userId }); 
+    res.status(200).json(tasks); 
   } catch (error) {
+    console.error('Error fetching tasks:', error);
     res.status(500).send(error.message);
   }
 });
-
 
 
 router.put('/todo/:id', async (req, res) => {
@@ -99,34 +96,6 @@ router.delete('/todo/:id', async (req, res) => {
   }
 });
 
-
-router.get('/todo/category/:userId', async (req, res) => {
-  const { userId } = req.params; 
-
-  const { category } = req.query;
-
-  if (!userId || !category) {
-    return res.status(400).json({ error: 'User ID and category are required' });
-  }
-
-  try {
-    const user = await User.findOne({ userId:userId });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const tasks = await Task.find({ user: userId, category });
-    if (tasks.length === 0) {
-      return res.status(404).json({ error: 'No tasks found for the specified user and category' });
-    }
-
-    res.status(200).json(tasks);
-
-  } catch (error) {
-    console.error('Error fetching tasks:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
 
 
 

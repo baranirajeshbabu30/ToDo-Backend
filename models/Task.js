@@ -5,6 +5,8 @@ const TaskSchema = new mongoose.Schema({
   description: { type: String, required: true },
   userId: { type: String, ref: 'User', required: true },
   category: { type: String, required: true },
+  duedate: { type: Date, required: true },
+
   progress: { type: String, enum: ['active', 'completed'], default: 'active' },
   createdAt: { type: Date, default: Date.now }
 },{ versionKey: false });

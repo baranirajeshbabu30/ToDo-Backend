@@ -12,7 +12,7 @@ require('dotenv').config();
 const app = express();
 
 const corsOptions = {
-  origin: ['http://localhost:3000', 'https://your-production-frontend-domain.com'],
+  origin: ['http://localhost:3000','https://zesty-gumdrop-5b2940.netlify.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true 

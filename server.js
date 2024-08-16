@@ -5,22 +5,18 @@ const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/task');
 const cors = require('cors');
 const PORT = process.env.PORT || 5001;
-const jwt = require('jsonwebtoken');
 
 require('dotenv').config();
 
 const app = express();
 
-const corsOptions = {
-  origin: ['http://localhost:3000','https://zesty-gumdrop-5b2940.netlify.app'],
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://zesty-gumdrop-5b2940.netlify.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true 
-};
+  credentials: true
+}));
 
-app.use(cors(corsOptions));
-
-app.options('*', cors(corsOptions))
 app.use(express.json());
 
 const connectToMongoDB = () => {
@@ -56,7 +52,6 @@ const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-
   if (!token) {
     return res.status(401).json({ message: 'Token required' });
   }
@@ -73,8 +68,7 @@ const authenticateToken = (req, res, next) => {
 };
 
 app.use('/api/auth', authRoutes);
-app.use('/api/task',  taskRoutes);  
-
+app.use('/api/task', taskRoutes);
 
 app.get('/author', (req, res) => {
   res.json({

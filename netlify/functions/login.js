@@ -4,7 +4,7 @@ const generateToken = require('../../utils/generateToken');
 
 
 const corsHeaders = {
-    'Access-Control-Allow-Origin': 'https://zesty-gumdrop-5b2940.netlify.app', 
+    'Access-Control-Allow-Origin': '*', 
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'OPTIONS, POST',
   };

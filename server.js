@@ -1,10 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const authRoutes = require('./netlify/functions/auth');
-const taskRoutes = require('./netlify/functions/task');
+const authRoutes = require('./routes/auth');
+const taskRoutes = require('./routes/task');
 const cors = require('cors');
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 const jwt = require('jsonwebtoken');
 
 require('dotenv').config();
@@ -23,7 +23,6 @@ const connectToMongoDB = () => {
 
   mongoose.connect(mongoURI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
     serverSelectionTimeoutMS: 50000
   });
 

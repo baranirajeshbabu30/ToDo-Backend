@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/task');
 const cors = require('cors');
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 
 require('dotenv').config();
 
@@ -12,6 +12,7 @@ const app = express();
 
 app.use(cors({
   origin: ['http://localhost:3000', 'https://zesty-gumdrop-5b2940.netlify.app'],
+
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true

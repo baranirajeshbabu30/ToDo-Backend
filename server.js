@@ -1,16 +1,21 @@
+require('dotenv').config(); // Load environment variables
+
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
+const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/task');
-const cors = require('cors');
+
 const PORT = process.env.PORT || 5001;
-const jwt = require('jsonwebtoken');
-
-require('dotenv').config();
-
 const app = express();
-app.use(cors());
+
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  methods: 'GET,POST,PUT,DELETE,OPTIONS',
+  allowedHeaders: 'Content-Type,Authorization',
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const connectToMongoDB = () => {
@@ -23,7 +28,7 @@ const connectToMongoDB = () => {
 
   mongoose.connect(mongoURI, {
     useNewUrlParser: true,
-    serverSelectionTimeoutMS: 50000
+    useUnifiedTopology: true,
   });
 
   mongoose.connection.on('connected', () => {
@@ -41,32 +46,8 @@ const connectToMongoDB = () => {
 
 connectToMongoDB();
 
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-
-  if (!token) {
-    return res.status(401).json({ message: 'Token required' });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET || 'mysecretkey', (err, decoded) => {
-    if (err) {
-      console.error('Token Verification Error:', err);
-      return res.status(403).json({ message: 'Invalid token' });
-    }
-
-    req.userId = decoded.userId;
-    next();
-  });
-};
-
-
-
-
 app.use('/api/auth', authRoutes);
-app.use('/api/task',  taskRoutes);  
-
+app.use('/api/task', taskRoutes);
 
 app.get('/author', (req, res) => {
   res.json({
@@ -75,4 +56,4 @@ app.get('/author', (req, res) => {
   });
 });
 
-app.listen(PORT, () => (`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -1,8 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const authRoutes = require('./routes/auth');
-const taskRoutes = require('./routes/task');
+const authRoutes = require('./routes/netlify/functions/auth');
+const taskRoutes = require('./routes/netlify/functions/task');
 const cors = require('cors');
 const PORT = process.env.PORT || 5000;
 const jwt = require('jsonwebtoken');

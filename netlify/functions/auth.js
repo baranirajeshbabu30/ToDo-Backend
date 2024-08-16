@@ -1,9 +1,9 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require('../../models/User');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-const generateToken = require('../utils/generateToken'); 
+const generateToken = require('../../utils/generateToken'); 
 
 const JWT_SECRET = process.env.JWT_SECRET;
 

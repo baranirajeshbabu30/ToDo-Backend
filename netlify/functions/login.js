@@ -4,13 +4,12 @@ const generateToken = require('../../utils/generateToken');
 
 
 const corsHeaders = {
-    'Access-Control-Allow-Origin': '*', // Adjust as needed
+    'Access-Control-Allow-Origin': '*', 
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'OPTIONS, POST',
   };
   
   exports.handler = async function(event, context) {
-    // Handle preflight OPTIONS request
     if (event.httpMethod === 'OPTIONS') {
       return {
         statusCode: 204,
@@ -55,7 +54,7 @@ const corsHeaders = {
           body: JSON.stringify({ token, userId: user.userId, useremail }),
         };
       } catch (error) {
-        console.error('Login error:', error.message);
+        console.error('Login error:', error); // Log the error to the Netlify function logs
         return {
           statusCode: 500,
           headers: corsHeaders,
@@ -70,4 +69,5 @@ const corsHeaders = {
       body: JSON.stringify({ error: 'Method Not Allowed' }),
     };
   };
+  
   

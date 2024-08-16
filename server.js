@@ -1,24 +1,17 @@
-require('dotenv').config();
-
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
+const bodyParser = require('body-parser');
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/task');
-
+const cors = require('cors');
 const PORT = process.env.PORT || 5001;
+const jwt = require('jsonwebtoken');
+
+require('dotenv').config();
+
 const app = express();
-
-const corsOptions = {
-  origin: 'http://localhost:3000',
-  methods: 'GET,POST,PUT,DELETE,OPTIONS',
-  allowedHeaders: 'Content-Type,Authorization',
-};
-
-app.use(cors({ origin: true }));
+app.use(cors());
 app.use(express.json());
-
-app.options('*', cors(corsOptions));
 
 const connectToMongoDB = () => {
   const mongoURI = process.env.MONGO_URI;
@@ -31,6 +24,7 @@ const connectToMongoDB = () => {
   mongoose.connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 50000
   });
 
   mongoose.connection.on('connected', () => {
@@ -48,8 +42,29 @@ const connectToMongoDB = () => {
 
 connectToMongoDB();
 
-app.use('/api', authRoutes);
-app.use('/api', taskRoutes);
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+
+  if (!token) {
+    return res.status(401).json({ message: 'Token required' });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET || 'mysecretkey', (err, decoded) => {
+    if (err) {
+      console.error('Token Verification Error:', err);
+      return res.status(403).json({ message: 'Invalid token' });
+    }
+
+    req.userId = decoded.userId;
+    next();
+  });
+};
+
+app.use('/api/auth', authRoutes);
+app.use('/api/task',  taskRoutes);  
+
 
 app.get('/author', (req, res) => {
   res.json({

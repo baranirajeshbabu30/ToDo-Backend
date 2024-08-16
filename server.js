@@ -1,4 +1,4 @@
-require('dotenv').config(); // Load environment variables
+require('dotenv').config();
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -17,8 +17,8 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
-app.options('*', cors(corsOptions));
 
+app.options('*', cors(corsOptions));
 
 const connectToMongoDB = () => {
   const mongoURI = process.env.MONGO_URI;

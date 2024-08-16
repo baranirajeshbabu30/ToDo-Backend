@@ -2,19 +2,28 @@ const mongoose = require('mongoose');
 const Task = require('../../models/Task'); 
 const User = require('../../models/User');  
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*', // Adjust as needed
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Methods': 'OPTIONS, POST, GET, PUT, DELETE',
+};
+
 if (mongoose.connection.readyState === 0) {
   mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
 }
-const corsHeaders = {
-    'Access-Control-Allow-Origin': '*', // Adjust as needed
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'OPTIONS, POST',
-  };
 
 exports.handler = async function (event, context) {
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 204,
+      headers: corsHeaders,
+      body: JSON.stringify({}),
+    };
+  }
+
   switch (event.httpMethod) {
     case 'POST':
       return await createTask(event);
@@ -28,7 +37,6 @@ exports.handler = async function (event, context) {
       return {
         statusCode: 405,
         headers: corsHeaders,
-
         body: JSON.stringify({ error: 'Method Not Allowed' }),
       };
   }
@@ -41,7 +49,6 @@ const createTask = async (event) => {
     return {
       statusCode: 400,
       headers: corsHeaders,
-
       body: JSON.stringify({ error: 'All fields are required' }),
     };
   }
@@ -52,7 +59,6 @@ const createTask = async (event) => {
       return {
         statusCode: 404,
         headers: corsHeaders,
-
         body: JSON.stringify({ error: 'User not found' }),
       };
     }
@@ -62,7 +68,6 @@ const createTask = async (event) => {
     return {
       statusCode: 201,
       headers: corsHeaders,
-
       body: JSON.stringify(task),
     };
   } catch (error) {
@@ -70,7 +75,6 @@ const createTask = async (event) => {
     return {
       statusCode: 400,
       headers: corsHeaders,
-
       body: JSON.stringify({ error: error.message }),
     };
   }
@@ -83,7 +87,6 @@ const getTasks = async (event) => {
     return {
       statusCode: 400,
       headers: corsHeaders,
-
       body: JSON.stringify({ error: 'User ID is required' }),
     };
   }
@@ -93,7 +96,6 @@ const getTasks = async (event) => {
     return {
       statusCode: 200,
       headers: corsHeaders,
-
       body: JSON.stringify(tasks),
     };
   } catch (error) {
@@ -101,7 +103,6 @@ const getTasks = async (event) => {
     return {
       statusCode: 500,
       headers: corsHeaders,
-
       body: JSON.stringify({ error: error.message }),
     };
   }
@@ -118,7 +119,6 @@ const updateTask = async (event) => {
       return {
         statusCode: 404,
         headers: corsHeaders,
-
         body: JSON.stringify({ error: 'Task not found' }),
       };
     }
@@ -132,7 +132,6 @@ const updateTask = async (event) => {
     return {
       statusCode: 200,
       headers: corsHeaders,
-
       body: JSON.stringify(task),
     };
   } catch (error) {
@@ -140,7 +139,6 @@ const updateTask = async (event) => {
     return {
       statusCode: 400,
       headers: corsHeaders,
-
       body: JSON.stringify({ error: error.message }),
     };
   }
@@ -153,7 +151,6 @@ const deleteTask = async (event) => {
     return {
       statusCode: 400,
       headers: corsHeaders,
-
       body: JSON.stringify({ error: 'Invalid ID format' }),
     };
   }
@@ -165,7 +162,6 @@ const deleteTask = async (event) => {
       return {
         statusCode: 404,
         headers: corsHeaders,
-
         body: JSON.stringify({ error: 'Task not found' }),
       };
     }
@@ -173,7 +169,6 @@ const deleteTask = async (event) => {
     return {
       statusCode: 204,
       headers: corsHeaders,
-
       body: null,
     };
   } catch (error) {
@@ -181,9 +176,7 @@ const deleteTask = async (event) => {
     return {
       statusCode: 500,
       headers: corsHeaders,
-
       body: JSON.stringify({ error: 'Internal Server Error' }),
     };
   }
 };
-

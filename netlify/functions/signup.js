@@ -1,12 +1,21 @@
 const { v4: uuidv4 } = require('uuid');
 const User = require('../../models/User');
+
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*', // Adjust as needed
+  'Access-Control-Allow-Origin': '*', 
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Methods': 'OPTIONS, POST',
 };
 
 exports.handler = async function(event, context) {
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 204,
+      headers: corsHeaders,
+      body: JSON.stringify({}),
+    };
+  }
+
   if (event.httpMethod === 'POST') {
     const { username, password, useremail } = JSON.parse(event.body);
 
@@ -23,8 +32,7 @@ exports.handler = async function(event, context) {
       if (existingUser) {
         return {
           statusCode: 400,
-        headers: corsHeaders,
-
+          headers: corsHeaders,
           body: JSON.stringify({ msg: 'User already exists' }),
         };
       }
@@ -41,7 +49,6 @@ exports.handler = async function(event, context) {
       return {
         statusCode: 201,
         headers: corsHeaders,
-
         body: JSON.stringify({ message: 'User created successfully' }),
       };
     } catch (error) {
@@ -49,7 +56,6 @@ exports.handler = async function(event, context) {
       return {
         statusCode: 500,
         headers: corsHeaders,
-
         body: JSON.stringify({ error: 'Error creating user' }),
       };
     }
